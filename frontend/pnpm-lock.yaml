@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 dependencies:
   '@babel/core':
     specifier: ^7.20.12
@@ -7666,3 +7662,7 @@ packages:
     dependencies:
       react: 18.2.0
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false

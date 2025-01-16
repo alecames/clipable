@@ -130,6 +130,31 @@ export default function Home() {
     }
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const droppedFile = e.dataTransfer.files[0];
+      setFile(droppedFile);
+      if (title === "") {
+        const videoName = droppedFile.name;
+        const parsedTitle = videoName.split(".").slice(0, -1).join(" ").replace(/_/g, " ");
+        setTitle(parsedTitle);
+      }
+    }
+  };
+
+  const clearFile = () => {
+    setFile(undefined);
+    setTitle("");
+  };
+
   return (
     <main className="h-full">
       <div className="container w-fit mx-auto flex flex-col space-y-6 justify-center items-center py-3">
@@ -160,21 +185,38 @@ export default function Home() {
             }}
           />
         </div>
-        <input
-          type="file"
-          className="file-input w-full max-w-xs"
-          accept="video/*"
-          onChange={(e) => {
-            if (e.target.files && e.target.files[0]) {
-              setFile(e.target.files[0]);
-              if (title === "") {
-                const videoName = e.target.files[0].name;
-                const parsedTitle = videoName.split(".").slice(0, -1).join(" ").replace(/_/g, " ");
-                setTitle(parsedTitle);
-              }
-            }
-          }}
-        />
+        <div
+          className="w-full max-w-xs border-2 border-dashed border-gray-400 p-4 text-center cursor-pointer"
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          onClick={() => document.querySelector(".file-input")?.click()}
+        >
+          <p><b>Drag and drop</b> or click to browse</p>
+          <p><i>{file ? file.name : title || "No file selected"}</i></p>
+          {!file && (
+            <input
+              type="file"
+              className="file-input w-full max-w-xs opacity-0 absolute"
+              accept="video/*"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setFile(e.target.files[0]);
+                  if (title === "") {
+                    const videoName = e.target.files[0].name;
+                    const parsedTitle = videoName.split(".").slice(0, -1).join(" ").replace(/_/g, " ");
+                    setTitle(parsedTitle);
+                  }
+                }
+              }}
+            />
+          )}
+        </div>
+        {file && (
+          <p className="text-sm text-blue-500 cursor-pointer" onClick={clearFile}>
+            Clear upload
+          </p>
+        )}
+
         <label className="label space-x-2 cursor-pointer self-start">
           <span className="label-text">Unlisted</span>
           <input
@@ -191,7 +233,7 @@ export default function Home() {
         </button>
       </div>
       <div className="flex flex-col space-y-6 justify-center items-center py-3">
-      {state !== State.Idle && (
+        {state !== State.Idle && (
           <animated.progress
             className="progress progress-accent w-full max-w-xs justify-center items-center"
             value={barvalue.percent}
